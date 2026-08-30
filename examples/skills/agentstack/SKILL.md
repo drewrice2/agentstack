@@ -5,10 +5,10 @@ description: Use when a user wants to codify, version, install, update, share, o
 
 # Purpose
 
-AgentStack is a CLI for reusable AI-agent skills and stacks. Local authoring,
-validation, and install need no registry. A private registry adds versions,
-approval, visibility, stacks, and audit. AgentStack does not execute agents,
-choose models, or run prompts.
+AgentStack is a CLI for reusable AI-agent skills and stacks. It supports
+token-free local authoring and an optional loopback registry for
+registry-backed sharing, approval, visibility, stacks, and audit. AgentStack
+does not execute agents, choose models, or run prompts.
 
 Read the user's goal, take the smallest safe command path, verify, and
 describe what changed in AgentStack terms. Only the install target changes
@@ -50,9 +50,10 @@ Details: `references/concepts.md`.
 - **Visibility** — who can read (`private`, `org`, `team`). It does not
   approve a version.
 
-## First success (no registry)
+## First success (Track A)
 
-When the user is new or has no token, run this loop and stop:
+When the user is authoring, validating, linting, or installing locally, use
+this token-free loop:
 
 ```bash
 agentstack doctor
@@ -70,24 +71,22 @@ The bundled copy of this skill is also a valid install:
 agentstack skill install examples/skills/agentstack --target local
 ```
 
-## Registry
+## Choose a track
 
-This repository is the CLI only. It does not include a registry server.
-Do not start Docker, invent a server, or treat `registry.agentstack.gg` as
-something you can sign up for from this tree.
+Use this decision rule:
 
-If `agentstack auth whoami` fails and no `AGENTSTACK_TOKEN_PATH` /
-`AGENTSTACK_TOKEN` is set, stay on the no-registry loop. Do not run
-`skill push`, `stack create`, `skill list`, `skill candidates`, or
-`skill version approve`.
+- Use Track A for authoring, validation, linting, and local installation.
+- If an existing registry authenticates, use it for registry-backed sharing.
+- If the user explicitly requests a local registry from this checkout, follow
+  the Track B procedure in `README.md`.
+- Otherwise, continue with Track A.
 
-If the user asked to share with a team and there is no token, say they
-need an org and a token on a registry they already run or were given,
-then keep going locally (`skill install` / git). Do not block local work
-on registry setup.
+`README.md` owns the complete Track B bootstrap sequence. Do not copy that
+sequence into this skill or its references.
 
-If whoami succeeds, use `references/stacks-and-teams.md` and
-`references/govern.md`.
+Before registry mutation, authenticate first. If authentication fails, apply
+the decision rule above and do not run registry mutation commands until a
+registry authenticates.
 
 ## Find the user's goal
 
@@ -100,8 +99,8 @@ local.
 | Write or fix one skill | `agentstack skill init` | `references/authoring.md` |
 | Install, update, or inspect managed context | `agentstack install list --json` | `references/install.md` |
 | Keep a repo converged to a declared set | `agentstack sync --check` | `references/install.md` |
-| Build a stack and share it with a team | `agentstack auth whoami` first; no token → stay local | `references/stacks-and-teams.md` |
-| Approve, yank, audit, or check blast radius | `agentstack auth whoami` first; no token → stay local | `references/govern.md` |
+| Build a stack and share it with a team | Apply the track decision rule; authenticate before mutation | `references/stacks-and-teams.md` |
+| Approve, yank, audit, or check blast radius | Apply the track decision rule; authenticate before mutation | `references/govern.md` |
 | Recover from a failed command | `agentstack doctor` | `references/troubleshooting.md` |
 | Know what a term means | — | `references/concepts.md` |
 
@@ -145,4 +144,6 @@ relevant warnings, and one next move.
 - Never put secrets in skills, docs, logs, shell history, or prompt
   examples.
 - Never imply AgentStack executes agents or guarantees runtime behavior.
-- Never set up, install, or self-host a registry from this repository.
+- Never expose the local registry beyond loopback, describe it as
+  production-ready or production self-hosting, reset its volumes without
+  assent, or expose its token.

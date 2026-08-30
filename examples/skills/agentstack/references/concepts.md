@@ -3,6 +3,10 @@
 Read this when the user asks what an AgentStack term means, or when an
 explanation hinges on one of the distinctions below.
 
+This repository includes the public CLI and an optional loopback registry.
+Track A needs no token. Registry-backed push, approval, stacks, and registry
+refs require authentication.
+
 ## Terms
 
 - **Skill** — a portable directory rooted at `SKILL.md` that tells an agent when
@@ -46,6 +50,7 @@ explanation hinges on one of the distinctions below.
   Resolve it with `agentstack target path <target>` instead of guessing.
 - **Stack-owned vs direct install** — a skill pulled in by a stack is managed by
   that stack. Update or remove it through the stack, not directly.
-- **This CLI vs a registry** — this repository has no registry server. Local
-  authoring and install need no token. Push, approve, stacks, and `sync` of
-  `org/name` refs need a registry you already run or were given.
+- **This CLI vs a registry** — Track A covers local authoring and install with
+  no token. Registry-backed push, approval, stacks, and `sync` of `org/name`
+  refs require an authenticated registry. This repository also includes an
+  optional loopback registry for Track B.

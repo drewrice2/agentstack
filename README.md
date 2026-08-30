@@ -6,8 +6,9 @@ CLI for reusable AI-agent skills. A skill is a directory rooted on
 `SKILL.md`. A stack is a curated set of approved skills. **AgentStack does
 not execute agents.**
 
-Local authoring needs no registry. A private registry adds versions,
-approval, visibility, stacks, and audit.
+AgentStack supports two tracks. Track A provides token-free local authoring
+and installation. Track B provides optional registry-backed sharing through an
+existing registry or the loopback registry in this checkout.
 
 ## Agents
 
@@ -32,7 +33,7 @@ agentstack --version
 Default credentials are a local file. No extra system packages are required
 to build.
 
-## First success
+## First success (Track A: token-free local authoring)
 
 ```sh
 agentstack doctor
@@ -54,25 +55,43 @@ use. User-level `codex` and `claude-code` require
 files with no receipts. `skill push` uploads a candidate;
 `skill version approve` makes one version current.
 
-## Team registry (optional)
+## Track B: Share through a local registry (optional)
 
-Local authoring does not need this. You need an org on a registry and a
-token. This repository is the CLI only — it does not include a registry
-server, and there is no self-hosted setup here. The default URL is
-`https://registry.agentstack.gg`. Loopback HTTP
-(`agentstack registry use http://127.0.0.1:8080`) works if you already run
-a compatible registry.
+Use Track B when you need registry-backed sharing and do not already have
+working access to an existing registry. You need a checkout of this
+repository, Docker Compose, `curl`, and the public `agentstack` CLI on your
+`PATH`. Run the commands from the repository root.
 
-Humans: `agentstack auth login`. Agents and CI: `AGENTSTACK_TOKEN_PATH`
-(or `AGENTSTACK_TOKEN`). Then use `org/name` refs for that org — not the
-`acme` examples unless that is your org.
+The `scripts/local-up.sh` script starts the loopback registry, ensures the
+`local` organization exists, and issues a new 30-day token. It writes progress
+to stderr and one raw token line to stdout. Configure the public CLI and push a
+candidate with the following commands:
 
-```sh
+```bash
+scripts/local-up.sh
+agentstack registry use http://127.0.0.1:8080
+read -rsp 'Token: ' TOKEN; printf '\n'
+printf '%s' "$TOKEN" | agentstack auth login --token-stdin
+unset TOKEN
 agentstack registry ping --auth
-agentstack skill push ./my-skill --org YOUR_ORG --scope org
+agentstack skill push ./my-skill --org local --scope org
 ```
 
-Headless export of an approved stack:
+The local registry is available only at `http://127.0.0.1:8080`. Rerunning
+`scripts/local-up.sh` preserves the `local` organization and issues a new
+30-day token. `skill push` creates a candidate; it does not approve the
+version. Use `agentstack skill version approve` when an authorized user is
+ready to make that version current.
+
+For a full local reset, `docker compose down -v` removes the registry's
+Postgres and blob volumes. This is destructive and is never run automatically.
+
+An already-hosted endpoint is also available at
+`https://registry.agentstack.gg`; use it only when you already have registry
+access and a token.
+
+For headless export of an approved stack, use a token path rather than placing
+a token in a command:
 
 ```sh
 AGENTSTACK_REGISTRY_URL=https://registry.agentstack.gg \

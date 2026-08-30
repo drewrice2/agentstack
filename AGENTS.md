@@ -1,15 +1,14 @@
 # AgentStack
 
-This repository is the `agentstack` CLI. It packages, validates, installs,
-and shares portable skill directories. It does not execute agents, pick
-models, or run prompts.
+This repository is the public `agentstack` CLI plus an optional loopback local
+registry. It packages, validates, installs, and shares portable skill
+directories. It does not execute agents, pick models, or run prompts.
 
 ## Using the product
 
 Load [`examples/skills/agentstack`](examples/skills/agentstack). That skill
 owns the safe command path. Prefer `--json` and `--no-input`. Never pass a
-bearer token as a CLI argument. This repository does not include a registry
-server; without a token, stay on local authoring and install.
+bearer token as a CLI argument.
 
 ## Changing this repository
 
@@ -19,8 +18,16 @@ Sources of truth, in order:
 2. [`docs/COMMANDS.md`](docs/COMMANDS.md) — names, JSON, env, exits
 3. [`docs/SKILL_FORMAT.md`](docs/SKILL_FORMAT.md) — validate and lint
 4. [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md) — registry HTTP
-5. [`README.md`](README.md) — first-success path
-6. [`examples/skills/agentstack`](examples/skills/agentstack) — agent operation
+5. [`scripts/local-up.sh`](scripts/local-up.sh) and
+   [`docker-compose.yml`](docker-compose.yml) — Track B bootstrap and
+   loopback host binding
+6. [`README.md`](README.md) — first-success path and Track B command sequence
+7. [`examples/skills/agentstack`](examples/skills/agentstack) — agent operation
+
+Use Track A first for authoring, validation, linting, and local installation.
+Use Track B only when the user explicitly needs registry-backed sharing and
+does not already have working registry access. If the user already has a
+working registry, use that registry instead.
 
 Keep these distinctions explicit in prose and examples:
 
@@ -31,8 +38,9 @@ Keep these distinctions explicit in prose and examples:
 - tokens never appear in URLs, logs, receipts, `config.toml`, or errors
 - JSON on stdout; JSON errors on stderr; `--json` never prompts
 
-Do not add a marketplace, workflow engine, agent runtime, or
-customer-operated registry server to this repo.
+Do not expand the local registry into a marketplace, workflow engine, agent
+runtime, or production hosting service. Do not present the loopback setup as
+production self-hosting or expose it over a LAN.
 
 Namespaces are singular and resource-first (`skill`, `stack`, `install`,
 `auth`, `registry`, `target`). Product name: AgentStack. Binary, crate, and

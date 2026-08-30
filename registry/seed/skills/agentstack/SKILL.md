@@ -57,10 +57,24 @@ that matter.
   over the installed root for `claude-code`/`codex` targets; exports stay
   verbatim.
 
+## Choose a track
+
+Use Track A for authoring, validation, linting, and local installation; it
+needs no token. Use Track B for registry-backed sharing when the user has an
+authenticated registry or explicitly requests the optional local registry
+from this checkout. The main skill's Track A/Track B decision rule determines
+which path to use. The README owns the local registry bootstrap sequence; do
+not copy those commands here.
+
+Authenticate first before routing any registry mutation. Without registry
+access, apply the decision rule and continue with Track A unless the user
+explicitly requests Track B.
+
 ## Find the user's goal
 
 Match the user's intent to one playbook and open only that reference. Most work
-starts local and needs no registry token; cloud and team steps are opt-in.
+starts local and needs no registry token; registry-backed and team steps are
+opt-in.
 
 | The user wants to… | Start with | Reference |
 | --- | --- | --- |
@@ -68,8 +82,8 @@ starts local and needs no registry token; cloud and team steps are opt-in.
 | Write or fix one skill | `agentstack skill init` | `references/authoring.md` |
 | Install, update, or inspect managed context | `agentstack install list --json` | `references/install.md` |
 | Keep a repo converged to a declared skill set | `agentstack sync --check` | `references/install.md` |
-| Build a stack and share it with a team | `agentstack stack create` | `references/stacks-and-teams.md` |
-| Approve, set visibility, yank, audit, or check blast radius | `agentstack skill candidates` | `references/govern.md` |
+| Build a stack and share it with a team | Apply the track decision rule; authenticate before mutation | `references/stacks-and-teams.md` |
+| Approve, set visibility, yank, audit, or check blast radius | Apply the track decision rule; authenticate before mutation | `references/govern.md` |
 | Recover from a failed command | `agentstack doctor` | `references/troubleshooting.md` |
 | Know what an AgentStack term means | — | `references/concepts.md` |
 
@@ -88,9 +102,9 @@ Report only decision-making facts — active registry, login status, managed
 installs, usable targets, doctor warnings — and offer one concrete next move
 (codify existing skills, install an approved stack, or inspect receipts).
 
-For a no-token learning loop, scan, validate, and install the example skill into
+For a Track A learning loop, scan, validate, and install the example skill into
 the `local` target (see `references/install.md`); it exercises shape,
-validation, receipts, and the update/remove lifecycle without cloud access.
+validation, receipts, and the update/remove lifecycle without registry access.
 
 # Output
 

@@ -9,8 +9,8 @@ This project does not have a published release history yet.
 - Add an optional local `agentstack-server` workspace member backed by Postgres
   and filesystem blobs.
 - Add `scripts/local-up.sh` and Compose to start a loopback Postgres registry.
-- Tell agents this repository has no registry server; no token means stay
-  local.
+- Documentation now leads with token-free local authoring and presents
+  `scripts/local-up.sh` as the optional loopback registry path.
 - Pin CI to read-only contents and document the cargo-deny license allowlist.
 - Recheck stack destinations at commit time so a destination that appears
   during installation is not overwritten without `--force`.
@@ -20,7 +20,6 @@ This project does not have a published release history yet.
 - Limit archive reads during unpack before materializing oversized files.
 - Remove private fixture identities and clarify credential ignores, example-org
   help, and registry stack authentication guidance.
-- Lead the CLI, README, and operator skill with local authoring.
 - Collapse overlapping guides. Agents load `examples/skills/agentstack`;
   `docs/COMMANDS.md` is the contract.
 - Remove pre-release terminology and align public examples with CLI contracts.
