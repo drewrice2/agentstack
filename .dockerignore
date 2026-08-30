@@ -1,0 +1,12 @@
+.git/
+.gitignore
+target/
+dist/
+docs/
+examples/
+scripts/
+.github/
+.agents/
+.claude/
+.codex/
+*.log

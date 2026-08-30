@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: agentstack
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agentstack"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+
+  agentstack-server:
+    build:
+      context: .
+      dockerfile: registry/Dockerfile
+    environment:
+      AGENTSTACK_SERVER_BIND: 0.0.0.0:8080
+      AGENTSTACK_DATABASE_URL: postgres://postgres:postgres@postgres:5432/agentstack
+      AGENTSTACK_BLOB_DIR: /var/lib/agentstack/blobs
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - registry-blobs:/var/lib/agentstack/blobs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8080/healthz"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+
+volumes:
+  postgres-data:
+  registry-blobs:
