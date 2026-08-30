@@ -8,7 +8,8 @@ models, or run prompts.
 
 Load [`examples/skills/agentstack`](examples/skills/agentstack). That skill
 owns the safe command path. Prefer `--json` and `--no-input`. Never pass a
-bearer token as a CLI argument.
+bearer token as a CLI argument. This repository does not include a registry
+server; without a token, stay on local authoring and install.
 
 ## Changing this repository
 

@@ -2,9 +2,12 @@
 
 Read this for the registry's shared-state actions: approving versions, changing
 visibility, yanking or deprecating, checking blast radius, and reading the audit
-trail. Every action here changes what teammates see or install. Quote the
-matching confirmation sentence and wait for explicit current-turn assent before
-running it.
+trail. Every action here changes what teammates see or install.
+
+This CLI repository does not ship a registry server. If `agentstack auth
+whoami` fails, stop and keep working locally. Quote the matching confirmation
+sentence and wait for explicit current-turn assent before running any command
+below.
 
 ## Roles
 

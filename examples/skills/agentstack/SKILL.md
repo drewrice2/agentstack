@@ -70,6 +70,25 @@ The bundled copy of this skill is also a valid install:
 agentstack skill install examples/skills/agentstack --target local
 ```
 
+## Registry
+
+This repository is the CLI only. It does not include a registry server.
+Do not start Docker, invent a server, or treat `registry.agentstack.gg` as
+something you can sign up for from this tree.
+
+If `agentstack auth whoami` fails and no `AGENTSTACK_TOKEN_PATH` /
+`AGENTSTACK_TOKEN` is set, stay on the no-registry loop. Do not run
+`skill push`, `stack create`, `skill list`, `skill candidates`, or
+`skill version approve`.
+
+If the user asked to share with a team and there is no token, say they
+need an org and a token on a registry they already run or were given,
+then keep going locally (`skill install` / git). Do not block local work
+on registry setup.
+
+If whoami succeeds, use `references/stacks-and-teams.md` and
+`references/govern.md`.
+
 ## Find the user's goal
 
 Match intent to one playbook and open only that reference. Most work starts
@@ -81,8 +100,8 @@ local.
 | Write or fix one skill | `agentstack skill init` | `references/authoring.md` |
 | Install, update, or inspect managed context | `agentstack install list --json` | `references/install.md` |
 | Keep a repo converged to a declared set | `agentstack sync --check` | `references/install.md` |
-| Build a stack and share it with a team | `agentstack stack create` | `references/stacks-and-teams.md` |
-| Approve, yank, audit, or check blast radius | `agentstack skill candidates` | `references/govern.md` |
+| Build a stack and share it with a team | `agentstack auth whoami` first; no token → stay local | `references/stacks-and-teams.md` |
+| Approve, yank, audit, or check blast radius | `agentstack auth whoami` first; no token → stay local | `references/govern.md` |
 | Recover from a failed command | `agentstack doctor` | `references/troubleshooting.md` |
 | Know what a term means | — | `references/concepts.md` |
 
@@ -126,3 +145,4 @@ relevant warnings, and one next move.
 - Never put secrets in skills, docs, logs, shell history, or prompt
   examples.
 - Never imply AgentStack executes agents or guarantees runtime behavior.
+- Never set up, install, or self-host a registry from this repository.

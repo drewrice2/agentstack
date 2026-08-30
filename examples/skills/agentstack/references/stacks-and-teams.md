@@ -3,8 +3,12 @@
 Read this when the user wants to group skills into a stack and roll it out —
 solo, to a team, or across a company. Creating or sharing a stack requires a
 registry token and a publisher/admin role. Installing a registry stack
-requires a token that can read that stack. Treat every mutation as shared
-state and confirm before running it.
+requires a token that can read that stack.
+
+This CLI repository does not ship a registry server. If `agentstack auth
+whoami` fails, do not run the commands below. Tell the user they need an org
+and token on a registry they already have, and continue with local install or
+git. Treat every mutation as shared state and confirm before running it.
 
 ## Build a stack
 

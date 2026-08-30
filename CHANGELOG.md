@@ -6,6 +6,8 @@ This project does not have a published release history yet.
 
 ## Unreleased
 
+- Tell agents this repository has no registry server; no token means stay
+  local.
 - Pin CI to read-only contents and document the cargo-deny license allowlist.
 - Recheck stack destinations at commit time so a destination that appears
   during installation is not overwritten without `--force`.

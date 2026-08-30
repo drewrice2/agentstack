@@ -57,7 +57,11 @@ files with no receipts. `skill push` uploads a candidate;
 ## Team registry (optional)
 
 Local authoring does not need this. You need an org on a registry and a
-token. The default URL is `https://registry.agentstack.gg`.
+token. This repository is the CLI only — it does not include a registry
+server, and there is no self-hosted setup here. The default URL is
+`https://registry.agentstack.gg`. Loopback HTTP
+(`agentstack registry use http://127.0.0.1:8080`) works if you already run
+a compatible registry.
 
 Humans: `agentstack auth login`. Agents and CI: `AGENTSTACK_TOKEN_PATH`
 (or `AGENTSTACK_TOKEN`). Then use `org/name` refs for that org — not the

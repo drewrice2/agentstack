@@ -46,3 +46,6 @@ explanation hinges on one of the distinctions below.
   Resolve it with `agentstack target path <target>` instead of guessing.
 - **Stack-owned vs direct install** — a skill pulled in by a stack is managed by
   that stack. Update or remove it through the stack, not directly.
+- **This CLI vs a registry** — this repository has no registry server. Local
+  authoring and install need no token. Push, approve, stacks, and `sync` of
+  `org/name` refs need a registry you already run or were given.
