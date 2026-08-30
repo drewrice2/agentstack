@@ -57,6 +57,9 @@ jobs:
     name: Local registry
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write
     services:
       postgres:
         image: postgres:16-alpine

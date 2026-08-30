@@ -11,6 +11,8 @@ This project does not have a published release history yet.
 - Add `scripts/local-up.sh` and Compose to start a loopback Postgres registry.
 - Documentation now leads with token-free local authoring and presents
   `scripts/local-up.sh` as the optional loopback registry path.
+- CI runs an isolated Postgres job that pushes a candidate through the
+  public CLI. The existing Rust and MSRV jobs stay database-free.
 - Pin CI to read-only contents and document the cargo-deny license allowlist.
 - Recheck stack destinations at commit time so a destination that appears
   during installation is not overwritten without `--force`.
