@@ -52,3 +52,128 @@ jobs:
 
       - name: Check MSRV
         run: cargo check --locked --all-targets
+
+  local-registry:
+    name: Local registry
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: agentstack
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d agentstack"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 30
+          --health-start-period 5s
+    env:
+      AGENTSTACK_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/agentstack
+      AGENTSTACK_SERVER_BIND: 127.0.0.1:8080
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build public CLI and registry server
+        run: cargo build --locked --workspace --bins
+
+      - name: Push through local registry
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+
+          cli=./target/debug/agentstack
+          server=./target/debug/agentstack-server
+          smoke_root="$(mktemp -d)"
+          server_pid=""
+          server_log="$smoke_root/server.log"
+
+          export AGENTSTACK_BLOB_DIR="$smoke_root/blobs"
+          export AGENTSTACK_CONFIG_DIR="$smoke_root/config"
+          export AGENTSTACK_CACHE_DIR="$smoke_root/cache"
+          export AGENTSTACK_CREDENTIAL_STORE=file
+          unset AGENTSTACK_REGISTRY_URL AGENTSTACK_TOKEN AGENTSTACK_TOKEN_PATH \
+            AGENTSTACK_TOKEN_FILE AGENTSTACK_ALLOW_TOKEN_FILE
+
+          cleanup() {
+            if [[ -n "${server_pid:-}" ]]; then
+              kill "$server_pid" >/dev/null 2>&1 || true
+              wait "$server_pid" >/dev/null 2>&1 || true
+            fi
+            rm -rf -- "$smoke_root"
+          }
+          trap cleanup EXIT
+
+          mkdir -p "$smoke_root/local-registry-smoke"
+          cat >"$smoke_root/local-registry-smoke/SKILL.md" <<'EOF'
+          ---
+          name: local-registry-smoke
+          description: Use when verifying a local AgentStack registry through the public CLI.
+          ---
+
+          # Local registry smoke
+
+          Use this skill to verify a local AgentStack registry through the public CLI.
+          EOF
+
+          "$server" init-db
+          "$server" org create local \
+            --name Local \
+            --owner-email operator@example.com \
+            --owner-name "Local Operator"
+
+          "$server" serve >"$server_log" 2>&1 &
+          server_pid=$!
+
+          server_ready=0
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/healthz >/dev/null 2>&1; then
+              server_ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [[ "$server_ready" != 1 ]]; then
+            cat "$server_log" >&2
+            exit 1
+          fi
+
+          "$cli" --json --no-input registry use http://127.0.0.1:8080 >/dev/null
+          "$server" token issue operator@example.com \
+            --label local-registry-smoke \
+            --expires-in-days 30 \
+            --raw | "$cli" --json --no-input auth login --token-stdin >/dev/null
+
+          ping_json="$("$cli" --json --no-input registry ping --auth)"
+          if ! grep -Eq '"authenticated"[[:space:]]*:[[:space:]]*true' <<<"$ping_json"; then
+            printf '%s\n' "$ping_json" >&2
+            exit 1
+          fi
+
+          push_json="$("$cli" --json --no-input skill push \
+            "$smoke_root/local-registry-smoke" \
+            --org local \
+            --scope org \
+            --yes)"
+          if ! grep -Eq '"visibility"[[:space:]]*:[[:space:]]*"org"' <<<"$push_json"; then
+            printf '%s\n' "$push_json" >&2
+            exit 1
+          fi
+          if ! grep -Eq 'local/local-registry-smoke@' <<<"$push_json"; then
+            printf '%s\n' "$push_json" >&2
+            exit 1
+          fi
