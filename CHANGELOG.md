@@ -6,6 +6,8 @@ This project does not have a published release history yet.
 
 ## Unreleased
 
+- Add an optional local `agentstack-server` workspace member backed by Postgres
+  and filesystem blobs.
 - Tell agents this repository has no registry server; no token means stay
   local.
 - Pin CI to read-only contents and document the cargo-deny license allowlist.

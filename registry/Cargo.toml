@@ -1,0 +1,33 @@
+[package]
+name = "agentstack-server"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Local PostgreSQL and filesystem registry server for AgentStack"
+license = "Apache-2.0"
+repository = "https://github.com/drewrice2/agentstack"
+publish = false
+
+[dependencies]
+anyhow = "1.0"
+async-trait = "0.1"
+axum = { version = "0.8", features = ["multipart"] }
+clap = { version = "4.5", features = ["derive"] }
+flate2 = "1.0"
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+sha2 = "0.10"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio-rustls", "postgres", "macros"] }
+tar = "0.4"
+thiserror = "2.0"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "fs", "net"] }
+tower-http = { version = "0.6", features = ["timeout", "set-header"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+[build-dependencies]
+flate2 = "1.0"
+sha2 = "0.10"
+tar = "0.4"
